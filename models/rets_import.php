@@ -106,6 +106,9 @@ class RetsImport extends RetsAppModel {
  */
 	public function finishImport($data) {
 		$data['finished'] = true;
+		if(!empty($data['modified'])) {
+			unset($data['modified']);
+		}
 		$this->set($data);
 		if(!$this->validates() || !$this->save($data)){
 			throw new OutOfBoundsException('Unable to start import');
