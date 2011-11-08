@@ -106,6 +106,9 @@ class RetsImport extends RetsAppModel {
  */
 	public function finishImport($data) {
 		$data['finished'] = true;
+		if(!empty($data['modified'])) {
+			unset($data['modified']);
+		}
 		$this->set($data);
 		if(!$this->validates() || !$this->save($data)){
 			throw new OutOfBoundsException('Unable to start import');
@@ -125,7 +128,13 @@ class RetsImport extends RetsAppModel {
 			$lastImport = date('Y-m-d H:i:s', strtotime($this->startImport));
 		}
 
-		$endDate = date('Y-m-d H:i:s', strtotime($this->defaultRange, strtotime($lastImport)));
+		$time = strtotime($this->defaultRange, strtotime($lastImport));
+		$now  = strtotime('now');
+		if($time > $now) {
+			$time = $now;
+		}
+		$endDate = date('Y-m-d H:i:s', $time);
+
 		return array($lastImport, $endDate);
 	}
 	
