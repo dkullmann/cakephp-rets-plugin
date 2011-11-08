@@ -105,7 +105,11 @@ class RetsSource extends DataSource {
 		}
 
 		$results = $this->RETS->Search($resource, $class, $query['conditions'], $options);
-		
+		/* Avoid some stupid error by reconnecting */
+		if ($this->RETS->Error()) {
+			$this->RETS->disconnect();	
+			$this->RETS->connect();	
+		}
 		if ($options['Count'] == 2) {
 			return $this->RETS->getRecordCount();
 		}
