@@ -119,7 +119,7 @@ class RetsImport extends RetsAppModel {
 /**
  * Calculate the dates to use for this import
  *
- * @param string $lastImport 
+ * @param mixed $lastImport last import record, last import time, or null 
  * @return array First value is start time, second value is end time
  * @author David Kullmann
  */
@@ -132,17 +132,19 @@ class RetsImport extends RetsAppModel {
 			if (!$lastImport[$this->alias]['finished']) {
 				return array($lastImport[$this->alias]['listing_modified_after'], $lastImport[$this->alias]['listing_modified_before']);
 			} else {
-				$lastImport = $lastImport[$this->alias]['listing_modified_before'];
+				$lastImport = $import[$this->alias]['listing_modified_before'];
 			}
 		}
 
 		$time = strtotime($this->defaultRange, strtotime($lastImport));
+		
 		$now  = strtotime('now');
 		if($time > $now) {
 			$time = $now;
 		}
+		
 		$endDate = date('Y-m-d H:i:s', $time);
-
+		
 		return array($lastImport, $endDate);
 	}
 	
