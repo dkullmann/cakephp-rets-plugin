@@ -124,8 +124,16 @@ class RetsImport extends RetsAppModel {
  * @author David Kullmann
  */
 	public function getImportDates($lastImport = null) {
-		if ($lastImport == null) {
+		if (empty($lastImport)) {
 			$lastImport = date('Y-m-d H:i:s', strtotime($this->startImport));
+		}
+		
+		if (is_array($lastImport)) {
+			if (!$lastImport[$this->alias]['finished']) {
+				return array($lastImport[$this->alias]['listing_modified_after'], $lastImport[$this->alias]['listing_modified_before']);
+			} else {
+				$lastImport = $lastImport[$this->alias]['listing_modified_before'];
+			}
 		}
 
 		$time = strtotime($this->defaultRange, strtotime($lastImport));
