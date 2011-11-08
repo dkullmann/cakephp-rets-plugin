@@ -81,11 +81,7 @@ class RETS {
 			self::$phRETS->AddHeader(USERAGENT_HEADER, $options['useragent']);
 		}
 		
-		self::$connection = self::$phRETS->Connect(
-			$options['login_url'],
-			$options['username'],
-			$options['password']
-		);
+		self::$connection = self::$phRETS->Connect($options['login_url'], $options['username'], $options['password']);
 
 		if (!self::$connection) {
 			$exception = self::$phRETS->error();
@@ -104,6 +100,14 @@ class RETS {
 	public function disconnect() {
 		self::$phRETS->Disconnect();
 		self::$connection = false;
+	}
+	
+	public function getRecordCount($index = 1) {
+		return self::$phRETS->search_data[$index]['total_records_found'];
+	}
+	
+	public function getResources() {
+		return self::$resources;
 	}
 	
 	/**
