@@ -116,16 +116,32 @@ class RetsImport extends RetsAppModel {
 /**
  * Calculate the dates to use for this import
  *
- * @param string $lastImport 
+ * @param mixed $lastImport last import record, last import time, or null 
  * @return array First value is start time, second value is end time
  * @author David Kullmann
  */
 	public function getImportDates($lastImport = null) {
-		if ($lastImport == null) {
+		if (empty($lastImport)) {
 			$lastImport = date('Y-m-d H:i:s', strtotime($this->startImport));
 		}
-
-		$endDate = date('Y-m-d H:i:s', strtotime($this->defaultRange, strtotime($lastImport)));
+		
+		if (is_array($lastImport)) {
+			if (!$lastImport[$this->alias]['finished']) {
+				return array($lastImport[$this->alias]['listing_modified_after'], $lastImport[$this->alias]['listing_modified_before']);
+			} else {
+				$lastImport = $import[$this->alias]['listing_modified_before'];
+			}
+		}
+		
+		$time = strtotime($this->defaultRange, strtotime($lastImport));
+		
+		$now  = strtotime('now');
+		if($time > $now) {
+			$time = $now;
+		}
+		
+		$endDate = date('Y-m-d H:i:s', $time);
+		
 		return array($lastImport, $endDate);
 	}
 	
