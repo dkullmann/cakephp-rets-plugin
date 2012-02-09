@@ -102,8 +102,8 @@ class RETS {
 		self::$connection = false;
 	}
 	
-	public function getRecordCount($index = 1) {
-		return self::$phRETS->search_data[$index]['total_records_found'];
+	public function getRecordCount() {
+		return self::$phRETS->search_data[ self::$phRETS->getResultPointer() ]['total_records_found'];
 	}
 	
 	public function getResources() {
