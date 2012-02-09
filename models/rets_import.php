@@ -132,10 +132,10 @@ class RetsImport extends RetsAppModel {
 			if (!$lastImport[$this->alias]['finished']) {
 				return array($lastImport[$this->alias]['listing_modified_after'], $lastImport[$this->alias]['listing_modified_before']);
 			} else {
-				$lastImport = $import[$this->alias]['listing_modified_before'];
+				$lastImport = $lastImport[$this->alias]['listing_modified_before'];
 			}
 		}
-		
+
 		$time = strtotime($this->defaultRange, strtotime($lastImport));
 		
 		$now  = strtotime('now');
