@@ -46,7 +46,22 @@ class RETS {
 	 *
 	 * @author David Kullmann
 	 */
-	public static $resources;
+	public static $resources = array();
+	
+	
+	/**
+	 * When a list of classes is found for a resource, cache it here
+	 *
+	 * @author David Kullmann
+	 */
+	public static $resourceClasses = array();
+	
+	/**
+	 * Used to cache a list of table elements for a class
+	 *
+	 * @author David Kullmann
+	 */
+	public static $tables = array();
 	
 	/**
 	 * Get the config and initialize the phRETS object
@@ -61,6 +76,8 @@ class RETS {
 		if (!is_array(self::$config)) {
 			throw new Exception('Configure::read("RETS") was not able to load your settings');
 		}
+		
+		self::connect();
 	}
 	
 	/**
@@ -101,13 +118,55 @@ class RETS {
 		self::$phRETS->Disconnect();
 		self::$connection = false;
 	}
-	
+
+	/**
+	 * Get the latest record count
+	 *
+	 * @param string $index Index of the query
+	 * @return void
+	 * @author David Kullmann
+	 */
 	public function getRecordCount($index = 1) {
 		return self::$phRETS->search_data[$index]['total_records_found'];
 	}
-	
+
+	/**
+	 * Get a list of resources for this RETS feed
+	 *
+	 * @return array List of resources for this RETS connection
+	 * @author David Kullmann
+	 */
 	public function getResources() {
 		return self::$resources;
+	}
+	
+	/**
+	 * Get a list of the classes available for a particular resource
+	 *
+	 * @param string $resource Rets resource name 
+	 * @return array Array of classes for the resource given
+	 * @author David Kullmann
+	 */
+	public function getClassesForResouces($resource = null) {
+		if(empty(self::$resourceClasses[$resource])) {
+			self::$resourceClasses[$resource] = self::$phRETS->GetMetadataClasses($resource);
+		}
+		return self::$resourceClasses[$resource];
+	}
+	
+	/**
+	 * Get table elements for a particular class-resource
+	 *
+	 * @param string $resource Rets resource name 
+	 * @param string $class Class name
+	 * @return array Array of data representing the table information
+	 * @author David Kullmann
+	 */
+	public function getTable($resource = null, $class = null) {
+		if(empty(self::$tables[$resource][$class])) {
+			self::$tables[$resource][$class] = self::$phRETS->GetMetadataTable($resource, $class);
+		}
+		return self::$tables[$resource][$class];
 	}
 	
 	/**
