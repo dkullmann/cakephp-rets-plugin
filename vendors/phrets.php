@@ -73,6 +73,9 @@ class phRETS {
 		return $this->last_server_response;
 	}
 
+	public function getResultPointer() {
+		return $this->int_result_pointer;
+	}
 
 	public function FirewallTest() {
 		$google = $this->FirewallTestConn("google.com", 80);

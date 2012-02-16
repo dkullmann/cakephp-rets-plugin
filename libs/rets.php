@@ -118,7 +118,7 @@ class RETS {
 		self::$phRETS->Disconnect();
 		self::$connection = false;
 	}
-
+	
 	/**
 	 * Get the latest record count
 	 *
