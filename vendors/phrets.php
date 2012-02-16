@@ -1317,6 +1317,10 @@ class phRETS {
 		}
 
 	}
+	
+	public function LastRequestPointer() {
+		return $this->int_result_pointer;
+	}
 
 
 	public function LastRequest() {

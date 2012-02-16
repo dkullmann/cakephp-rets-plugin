@@ -126,7 +126,10 @@ class RETS {
 	 * @return void
 	 * @author David Kullmann
 	 */
-	public function getRecordCount($index = 1) {
+	public function getRecordCount($index = null) {
+		if($index === null) {
+			$index = self::$phRETS->LastRequestPointer();
+		}
 		return self::$phRETS->search_data[$index]['total_records_found'];
 	}
 
