@@ -62,6 +62,23 @@ class RETS {
 	 * @author David Kullmann
 	 */
 	public static $tables = array();
+
+	/**
+	 * Map of field types to CakePHP DBOMySQL field types
+	 *
+	 * @var string
+	 */
+	public static $typeMap = array(
+		'Character' => 'string',
+		'Long' => 'string',
+		'DateTime' => 'datetime',
+		'Date' => 'date',
+		'Boolean' => 'boolean',
+		'Decimal' => 'decimal',
+		'Tiny' => 'integer',
+		'Small' => 'integer',
+		'Int' => 'integer'
+	);
 	
 	/**
 	 * Get the config and initialize the phRETS object
@@ -170,6 +187,63 @@ class RETS {
 			self::$tables[$resource][$class] = self::$phRETS->GetMetadataTable($resource, $class);
 		}
 		return self::$tables[$resource][$class];
+	}
+
+	/**
+	 * Return the length of a db column based on the type of field
+	 *
+	 * @param array $fieldSpec 
+	 * @return integer max field length
+	 * @author David Kullmann
+	 */
+	public function convertField($fieldSpec, $resource) {
+		$type = self::$typeMap[ $fieldSpec['DataType'] ];
+		$length = null;
+		$field = $fieldSpec['SystemName'];
+		
+		$maxSelect = $fieldSpec['MaxSelect'] ? $fieldSpec['MaxSelect'] : 1;
+		$maxLength = $fieldSpec['MaximumLength'];
+		$interp = $fieldSpec['Interpretation'];
+		
+		if(in_array($interp, array('Lookup', 'LookupMulti'))) {
+			$values = self::$phRETS->GetLookupValues($resource, $fieldSpec['LookupName']);
+			foreach($values as $value) {
+				if(strlen($value['LongValue']) > $maxLength) {
+					$maxlength = strlen($value['LongValue']);
+				}
+			}
+			$length  = ( $maxSelect * ( $maxLength + 3)  ) - 1;
+			if($length > 255 && $type === 'string') $type = 'text';
+		} else {
+			switch($fieldSpec['DataType']) {
+				case 'Boolean' :
+					$length = 1;
+					break;
+				case 'Tiny' :
+					$length = 2;
+					break;
+				case 'Small' :
+					$length = 6;
+					break;
+				case 'Int' :
+					$length = 11;
+					break;
+				case 'Long': 
+					$length = 20;
+					break;
+				case 'Decimal' :
+					$precision = $fieldSpec['Precision'];
+					$length = implode(',', array_filter(array($maxLength, $precision)));
+					break;
+				case 'Character' :
+					if($maxLength > 255) $type = 'text';
+					$length = $maxLength;
+				case 'DateTime' :
+				case 'Date' :
+				default:
+			};
+		}
+		return compact('length', 'type');
 	}
 	
 	/**
